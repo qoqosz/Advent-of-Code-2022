@@ -35,6 +35,7 @@ def is_file(day):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('day')    
+    parser.add_argument('-y', '--year', type=int, default=2022)
     parser.add_argument('-f', '--force', action='store_true')
     args = parser.parse_args()
 
