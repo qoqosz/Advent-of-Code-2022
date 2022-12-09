@@ -17,7 +17,7 @@ def sign(x):
         return 0
     return -1 if x < 0 else 1
 
-class SimRope:
+class Rope:
     def __init__(self):
         self.t_visited = set((0, 0))
         self.H = self.T = 0
@@ -38,7 +38,7 @@ class SimRope:
 
             
 def sim_rope(motions, n_knots=2):
-    rope = [SimRope() for _ in range(n_knots - 1)]
+    rope = [Rope() for _ in range(n_knots - 1)]
     
     for step in motions:
         d, n = step
