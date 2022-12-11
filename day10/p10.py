@@ -57,7 +57,7 @@ idx_crt = 0
 display = ''
 
 for cycle, value in CPU().iter(instructions):
-    # display chars changed for better visibility
+    # display chars changed for better readability
     if abs(idx_crt - value) <= 1:
         display += '█'
     else:
