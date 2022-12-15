@@ -83,3 +83,31 @@ def bubble_sort(a):
     
 sorted_list = bubble_sort(eval_lines)
 print((sorted_list.index([[2]]) + 1) * (sorted_list.index([[6]]) + 1))
+
+def cmp(left, right):
+    """
+    Different approach with match statement pattern matching.
+    
+    Does not return anything if left and right are the same.
+    """
+    match left, right:
+        case int(), int():
+            if left < right:
+                return True
+            if left > right:
+                return False
+        case list(), int():
+            return cmp(left, [right])
+        case int(), list():
+            return cmp([left], right)
+        case list(), list():
+            for a, b in zip(left, right):
+                if (res := cmp(a, b)) is not None:
+                    return res
+
+            if len(left) < len(right):
+                return True
+            if len(left) > len(right):
+                return False
+                
+res = sorted(eval_lines, key=cmp_to_key(lambda x, y: -int(cmp(x, y))))

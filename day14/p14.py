@@ -2,7 +2,6 @@ from collections import namedtuple
 from operator import or_
 from functools import reduce
 
-
 class Point(namedtuple('Point', 'x y')):
     def __iadd__(self, other):
         self = self.__add__(other)
@@ -19,6 +18,9 @@ class Point(namedtuple('Point', 'x y')):
     
     def __hash__(self):
         return hash((self.x, self.y))
+    
+    def __repr__(self):
+        return f'{self.x, self.y}'
     
     @classmethod
     def from_str(self, p):
@@ -79,36 +81,31 @@ class Path:
     def to_set(self):
         return reduce(or_, (line.to_set() for line in self.lines))   
         
-        
 class Cave:
-    def __init__(self, paths, max_depth=10):
+    def __init__(self, paths, source, max_depth=10):
         self.rocks = reduce(or_, (path.to_set() for path in paths))
-        self.sand = set()
+        self.source = source
         self.max_depth = max_depth
-        self.prev = None
+        self.prevs = [source]
         
     def is_air(self, point):
-        return not (point in self.rocks or point in self.sand)
-
+        return not point in self.rocks
     
-    def pour(self, src):
+    def pour(self):
         """assume same source"""
-        if not self.prev:
-            return self._pour(src)
+        try:
+            p = self.prevs[-1]
+        except IndexError:
+            p = self.source
+            
+        filled = self._pour(p)
         
-        if self.is_air(self.prev):
-            return self._pour(self.prev)
+        if filled == self.source:
+            raise StopIteration('Cave filled in!')
         
-        self.prev = self.prev - Point(0, 1)
-        
-        if self.prev != src:
-            return self._pour(self.prev)
-        
-        raise ValueError('Cave filled in!')    
+        return filled
     
-    def _pour(self, src):
-        prev = None
-        
+    def _pour(self, src):   
         while True:
             if src.y >= self.max_depth:
                 raise StopIteration('Point falling out into the deep')            
@@ -123,17 +120,16 @@ class Cave:
                     prev = src
                     src += dt
                     move_on = True
+                    self.prevs.append(src)
                     break
                     
             if move_on:
                 continue
-              
-            self.sand.add(src)
-            self.prev = prev
+
+            self.rocks.add(self.prevs.pop())
             break
-                
-        return src    
-        
+
+        return src
         
 sand = Point(500, 0)
 
@@ -144,19 +140,18 @@ with open('p14.txt') as f:
         path = Path([Point.from_str(p) for p in l.strip().split(' -> ')])
         paths.append(path)
         
-
 # Part I
-cave = Cave(paths, max_depth=200)
+cave = Cave(paths, sand, max_depth=200)
 i = 0
 
 while True:
     try:
-        cave.pour(sand)
+        cave.pour()
     except StopIteration:
         print(i)
         break
     i += 1      
-    
+  
 # Part II
 def highest_y(paths):
     max_depth = 0
@@ -169,17 +164,13 @@ def highest_y(paths):
     
 floor_y = 2 + highest_y(paths)
 floor = Path([Point(-100_000, floor_y), Point(100_000, floor_y)])
-cave = Cave([*paths, floor], max_depth=floor_y)
+cave = Cave([*paths, floor], sand, max_depth=floor_y)
 i = 0
 
 while True:
     try:
-        dest = cave.pour(sand)
-        
-        if dest == sand:
-            print(i+1)
-            break
+        dest = cave.pour()
     except StopIteration:
-        print(i)
+        print(i + 1)
         break
     i += 1
