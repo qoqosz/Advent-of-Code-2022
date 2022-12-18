@@ -33,9 +33,9 @@ with open('p18.txt') as f:
 print(count_faces(data))
 
 # Part II
-def water_fill(data):
+def lava_fill(data):
     """
-    Fill in the grid with water and count with how many faces 
+    Fill in the grid with lava and count with how many faces 
     it will touch.
     """
     visited = set((0, 0, 0))
@@ -51,7 +51,7 @@ def water_fill(data):
                 continue
             
             if w in data:
-                # water touches an exposed face
+                # lava touches an exposed face
                 n_faces += 1
                 visited.add(w)
             else:
@@ -61,4 +61,4 @@ def water_fill(data):
 
     return n_faces
 
-print(water_fill(data))
+print(lava_fill(data))
