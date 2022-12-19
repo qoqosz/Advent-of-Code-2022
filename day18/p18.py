@@ -12,12 +12,9 @@ def count_faces(data):
     n_total = 0
     
     for p in data:
-        n_adj = 0
         for n in neighbors3d(p):
             if n in data:
-                n_adj += 1
-                
-        n_total += n_adj
+                n_total += 1
     
     return len(data) * 6 - n_total
     
@@ -41,7 +38,6 @@ def lava_fill(data):
     visited = set((0, 0, 0))
     queue = deque([(0, 0, 0)])
     n_faces = 0
-
     
     while queue:
         node = queue.popleft()
@@ -53,7 +49,6 @@ def lava_fill(data):
             if w in data:
                 # lava touches an exposed face
                 n_faces += 1
-                visited.add(w)
             else:
                 if w not in visited:
                     visited.add(w)
