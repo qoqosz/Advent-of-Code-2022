@@ -49,7 +49,13 @@ class Tetris:
         
         return any(x & y for x, y in zip(board_slice, piece))
 
-    def process(self):
+    def process(self, n=1):
+        for _ in range(n):
+            self._process()
+        
+        return self
+
+    def _process(self):
         piece = next(self.piter)
 
         while True:
@@ -87,21 +93,13 @@ with open('p17.txt') as f:
     
       
 # Part I
-t = Tetris(pieces, jet_pattern)
-
-for _ in range(2022):
-    t.process()
-    
+t = Tetris(pieces, jet_pattern).process(2022)
 print(t.h - 3)
 
 # Part II
 
 # First, simulate 50k rocks to record a pattern in the board
-t = Tetris(pieces, jet_pattern)
-
-for _ in range(50_000):
-    t.process()
-    
+t = Tetris(pieces, jet_pattern).process(50_000)
 pattern = [t.board[i] for i in range(t.h - 3)]
 
 # Then, start shifting a pattern and calculate the "cost".
@@ -149,9 +147,6 @@ i_max = i
 a, b = divmod(1000000000000, i_max)
 
 # Again, run a simulation b times to record the height
-t = Tetris(pieces, jet_pattern)
+t = Tetris(pieces, jet_pattern).process(b)
 
-for i in range(b):
-    t.process()
-    
 print(a * idx[0] + (t.h - 3))
