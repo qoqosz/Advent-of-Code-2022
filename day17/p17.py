@@ -1,4 +1,5 @@
 from itertools import cycle
+import numpy as np
 
 
 boundaries = 0b100000001
@@ -92,3 +93,65 @@ for _ in range(2022):
     t.process()
     
 print(t.h - 3)
+
+# Part II
+
+# First, simulate 50k rocks to record a pattern in the board
+t = Tetris(pieces, jet_pattern)
+
+for _ in range(50_000):
+    t.process()
+    
+pattern = [t.board[i] for i in range(t.h - 3)]
+
+# Then, start shifting a pattern and calculate the "cost".
+# When cost is minimized, the cycle in the pattern and shifted
+# one overlaps, which results in the minimal cost.
+def find_min(pattern):
+    min_cost = 1_000_000_000_000
+    i_min = 0
+    data = np.array(pattern)
+    
+    for i in range(1_000, 20_000):
+        cost =  np.abs(data[i:] - data[:-i]).sum()
+        
+        if cost < min_cost:
+            min_cost = cost
+            i_min = i
+            
+    return i_min, min_cost
+
+i_min, _ = find_min(pattern)
+sub_pattern = pattern[i_min:i_min+40]
+
+# Find indices of the sub_pattern in the pattern
+def subfinder(mylist, pattern):
+    matches = []
+    for i in range(len(mylist)):
+        if mylist[i] == pattern[0] and mylist[i:i+len(pattern)] == pattern:
+            matches.append(i)
+    return matches
+    
+idx = np.array(subfinder(pattern, sub_pattern))
+
+# Run a simulation again to get a number of rocks that have to fall
+# in order to fill in the board up to a height of idx[0]
+t = Tetris(pieces, jet_pattern)
+
+for i in range(10_000):
+    t.process()
+    
+    if (t.h - 3) > idx[0]:
+        break
+        
+i_max = i
+
+a, b = divmod(1000000000000, i_max)
+
+# Again, run a simulation b times to record the height
+t = Tetris(pieces, jet_pattern)
+
+for i in range(b):
+    t.process()
+    
+print(a * idx[0] + (t.h - 3))
